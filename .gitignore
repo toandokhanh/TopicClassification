@@ -1,0 +1,16 @@
+lexRank.py
+requirements.txt
+sumary.py
+summary.py
+test_sumy.py
+testgpt2.py
+textRank.py
+test.py
+/tmp
+error.txt
+# handle_save_log.py
+result_v1.xlsx
+~$result_v1.xlsx
+test/
+data/
+result/

@@ -68,8 +68,8 @@ if __name__ == "__main__":
     files2 = [doc for doc in os.listdir(path2) if (doc.endswith('.txt'))]
     
     result = []
-    i = 0
-    
+    count = 0
+    total_similarity_result = 0
     for file1 in files1:
         for file2 in files2:
             if file1.split('_')[0] == file2.split('_')[0]:
@@ -89,10 +89,14 @@ if __name__ == "__main__":
                     similarity_result = 0
                     
                 kq = '{},{},{},{},{},{}'.format(file1, file2, similarity, topic1, topic2, similarity_result)
-                i += 1
+                count += 1
+                total_similarity_result += similarity_result
                 f.write(kq + "\n")
                 result.append(kq)
-    
+    average_accuracy = total_similarity_result / count if count > 0 else 0
+    similarity_accuracy = total_similarity_result / len(files1)  # Calculate average similarity per file in directory1
     end_time = datetime.now()
-    f.write('\n=> Tổng số có {} file đã thực thi '.format(i))
+    f.write('\n=> Tổng số có {} file đã thực thi '.format(count))
+    f.write('\n=> Độ chính xác của chủ đề: {} '.format(average_accuracy))
+    f.write('\n=> Độ tương đồng trung bình : {} '.format(similarity_accuracy))
     f.write('\n=> Thời gian thực thi: ' + str(end_time - start_time))

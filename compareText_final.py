@@ -6,7 +6,7 @@ import time
 from regex import P
 import argparse
 
-from sklearn.feature_extraction.text import TfidfVectorizer 
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 def Tong(test_content):
@@ -58,45 +58,48 @@ def check_similarity(file1, file2):
 if __name__ == "__main__":
     today = datetime.today()
     time = today.strftime("%H") + "h" + today.strftime("%M")
-    date = today.strftime("%Y-%m-%d") 
+    date = today.strftime("%Y-%m-%d")
     dateVN = today.strftime("%d-%m-%Y")
+    os.makedirs('result', exist_ok=True)
     f = open('result/result.txt', 'w', encoding='utf-8')
     f.write("Thực hiện: " + str(time) + " " + str(dateVN) + "\n")
     f.write("\n==== ==== ==== ==== ==== ====\n")
-    
+
     files1 = [doc for doc in os.listdir(path1) if (doc.endswith('.txt'))]
     files2 = [doc for doc in os.listdir(path2) if (doc.endswith('.txt'))]
-    
+
     result = []
     count = 0
     total_similarity_result = 0
+    total_cosine_similarity = 0
     for file1 in files1:
         for file2 in files2:
             if file1.split('_')[0] == file2.split('_')[0]:
                 file1_path = path1 + file1
                 file2_path = path2 + file2
-                
-                similarity = str(check_similarity(file1_path, file2_path)) 
-                
+
+                similarity = str(check_similarity(file1_path, file2_path))
+
                 # Trích xuất chủ đề từ tên file
                 topic1 = extract_topic_from_filename(file1)
                 topic2 = extract_topic_from_filename(file2)
-                
+
                 # So sánh chủ đề và ghi kết quả
                 if topic1 == topic2:
                     similarity_result = 1
                 else:
                     similarity_result = 0
-                    
+
                 kq = '{},{},{},{},{},{}'.format(file1, file2, similarity, topic1, topic2, similarity_result)
+                total_cosine_similarity += float(similarity)
                 count += 1
                 total_similarity_result += similarity_result
                 f.write(kq + "\n")
                 result.append(kq)
     average_accuracy = total_similarity_result / count if count > 0 else 0
-    similarity_accuracy = total_similarity_result / len(files1)  # Calculate average similarity per file in directory1
+    similarity_accuracy = total_cosine_similarity / count if count else 0  # Calculate average similarity per file in directory1
     end_time = datetime.now()
     f.write('\n=> Tổng số có {} file đã thực thi '.format(count))
-    f.write('\n=> Độ chính xác của chủ đề: {} '.format(average_accuracy))
-    f.write('\n=> Độ tương đồng trung bình : {} '.format(similarity_accuracy))
+    f.write('\n=> Filename-label agreement (not classifier accuracy): {} '.format(average_accuracy))
+    f.write('\n=> Mean pairwise TF-IDF cosine similarity (%): {} '.format(similarity_accuracy))
     f.write('\n=> Thời gian thực thi: ' + str(end_time - start_time))

@@ -1,6 +1,5 @@
 from regex import F
 from num2words import num2words
-from srtToTxt import srt_to_txt
 
 
 

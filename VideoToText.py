@@ -1,3 +1,5 @@
+import subprocess
+import shlex
 # dktoan: modify 02/10/2023
 # dktoan: modify 06/10/2023
 import time
@@ -40,7 +42,7 @@ def get_arguments():
     return arguments
 
 def recognize(wav_filename, args):
-    
+
     data, s = librosa.load(wav_filename)
     # librosa.output.write_wav('tmp.wav', data, s)
     sf.write('tmp/tmp.wav', data, s)
@@ -49,7 +51,7 @@ def recognize(wav_filename, args):
 
     r = sr.Recognizer()
     with sr.AudioFile('tmp/tmp_32.wav') as source:
-        audio = r.record(source)  
+        audio = r.record(source)
 
     print('audiofile loaded')
 
@@ -63,11 +65,11 @@ def recognize(wav_filename, args):
     video_name = os.path.splitext(args.video)[0]
     with open( video_name +'_'+args.language+ '.txt', 'a', encoding='utf-8') as f:
         f.write(' {}'.format(result))
-    
+
 
 def get_audio(video):
-    os.system('ffmpeg -y  -threads 4 -i {} -f wav -ab 192000 -vn {}'.format(video, 'tmp/current.wav'))
-    
+    subprocess.run(shlex.split('ffmpeg -y  -threads 4 -i {} -f wav -ab 192000 -vn {}'.format(video, 'tmp/current.wav')), check=True, timeout=1800)
+
 # def get_audio(video, name_file):
 #     os.system('ffmpeg -y  -threads 4\
 #  -i {} -f wav -ab 192000 -vn {}'.format(video, name_file))
@@ -108,10 +110,10 @@ def noise_reduce(file,file_out):
     print('Đang giảm nhiễu với thuật toán noise_reduce!')
 
 def noise_deepfilternet(file,file_out):
-    os.system('deepFilter {} -o {}'.format(file,file_out))
+    subprocess.run(shlex.split('deepFilter {} -o {}'.format(file, file_out)), check=True, timeout=1800)
     print('Đang giảm nhiễu với thuật toán noise_deepfilternet!')
 
-def rename(filename,newname): 
+def rename(filename,newname):
     os.rename(filename, newname)
 
 def get_topic(text):
@@ -125,7 +127,7 @@ def get_topic(text):
         if os.path.exists(video_name +'_'+args.language+'_vi.txt'):
             print("Save the sub-vi file successfully")
         else:
-            print("Save the sub-vi file failed") 
+            print("Save the sub-vi file failed")
     topic = '_'.join(classify(text_trans))
     return topic
 
@@ -142,7 +144,7 @@ def translate_text(text, src, dest):
 
 if __name__ == '__main__':
     from time import gmtime, strftime
-    time_text = str(strftime("%Y%m%d_%H%M%S", gmtime())) 
+    time_text = str(strftime("%Y%m%d_%H%M%S", gmtime()))
     folder = time_text
     checkfolder(folder)
     checkfolder('tmp')
@@ -182,7 +184,7 @@ if __name__ == '__main__':
             for file in files:
                 recognize(file,args)
             pass
-    
+
     video_name = os.path.splitext(args.video)[0]
     file_path = video_name+'_'+args.language+'.txt'
 
